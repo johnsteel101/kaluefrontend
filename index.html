@@ -860,7 +860,7 @@
 // ══════════════════════════════════════════
 // BACKEND STUB (replace with real API later)
 // ══════════════════════════════════════════
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://kalue-backend-2.onrender.com/";
 async function apiTest() {
   try { await fetch(`${API_BASE}/`); console.log("✅ Backend OK"); }
   catch (e) { console.warn("⚠️ Backend offline — running on localStorage"); }
