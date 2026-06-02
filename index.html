@@ -55,7 +55,20 @@
     #startupScreen { position:fixed; inset:0; background:var(--bg-deep); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; transition:opacity .8s ease; }
     .startup-burst { font-size:5rem; animation:burstPop 1s ease infinite alternate; filter:drop-shadow(0 0 30px var(--fire)); }
     @keyframes burstPop { 0% { transform:scale(1) rotate(-5deg); } 100% { transform:scale(1.12) rotate(5deg); } }
-    .startup-name { font-family:var(--font-head); font-size:2.4rem; font-weight:800; letter-spacing:.08em; background:linear-gradient(135deg, var(--fire), var(--gold), var(--spark)); -webkit-background-clip:text; background-clip:text; color:transparent; margin:18px 0 6px; }
+    .startup-name { 
+  font-family:var(--font-head); 
+  font-size:2.4rem; 
+  font-weight:800; 
+  letter-spacing:.08em; 
+  background:linear-gradient(135deg, var(--fire), var(--gold), var(--spark)); 
+  -webkit-background-clip:text; 
+  background-clip:text; 
+  color:transparent; 
+  margin:18px 0 6px;
+  text-align: center;
+  word-break: break-word;
+  white-space: normal;
+}
     .startup-sub { color:var(--text-muted); font-size:.9rem; letter-spacing:.14em; text-transform:uppercase; margin-bottom:32px; }
     .loading-track { width:280px; height:3px; background:rgba(255,255,255,.07); border-radius:4px; overflow:hidden; }
     .loading-fill  { height:100%; background:linear-gradient(90deg, var(--fire), var(--gold)); animation:loadFill 2.8s ease forwards; width:0; }
@@ -271,7 +284,15 @@
     @media (max-width:480px) {
       .stats-row { grid-template-columns:1fr; }
     }
-
+    @media (max-width:480px) {
+      .startup-name {
+        font-size: 1.8rem !important;
+        letter-spacing: 0.05em !important;
+      }
+      .startup-burst {
+        font-size: 3.5rem !important;
+      }
+    }
     /* ─── EMPTY STATE ─── */
     .empty-state { text-align:center; padding:48px 20px; color:var(--text-dim); }
     .empty-state i { font-size:2.5rem; margin-bottom:12px; display:block; }
@@ -1496,11 +1517,39 @@ function showReceipt() {
 window.showReceipt = showReceipt;
 
 function printReceipt() {
-  const c = document.getElementById("receiptContent").innerHTML;
-  document.getElementById("printReceipt").innerHTML = c;
-  document.getElementById("printReceipt").style.display = "block";
-  window.print();
-  setTimeout(() => { document.getElementById("printReceipt").style.display = "none"; }, 1000);
+  const receiptHTML = document.getElementById("receiptContent").innerHTML;
+  const printWindow = window.open('', '_blank');
+  
+  printWindow.document.write('<!DOCTYPE html>\n' +
+    '<html>\n' +
+    '<head>\n' +
+    '  <title>KALUE Fireworks - Risiti</title>\n' +
+    '  <meta charset="UTF-8">\n' +
+    '  <style>\n' +
+    '    * { margin: 0; padding: 0; box-sizing: border-box; }\n' +
+    '    body { font-family: "Courier New", monospace; background: #fff; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }\n' +
+    '    .receipt-box { max-width: 380px; width: 100%; margin: 0 auto; background: #fff; color: #111; border-radius: 12px; padding: 24px; font-size: 0.82rem; line-height: 1.7; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }\n' +
+    '    .receipt-box .r-logo { text-align: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 4px; }\n' +
+    '    .receipt-box .r-sub { text-align: center; font-size: 0.7rem; color: #555; margin-bottom: 14px; border-bottom: 2px dashed #ccc; padding-bottom: 10px; }\n' +
+    '    .receipt-box .r-row { display: flex; justify-content: space-between; margin: 3px 0; }\n' +
+    '    .receipt-box .r-total { border-top: 2px dashed #ccc; margin-top: 10px; padding-top: 8px; font-weight: 900; font-size: 0.95rem; }\n' +
+    '    .receipt-box .r-footer { text-align: center; font-size: 0.7rem; color: #777; margin-top: 14px; border-top: 1px dashed #ccc; padding-top: 8px; }\n' +
+    '    @media print { body { padding: 0; margin: 0; } .receipt-box { box-shadow: none; border: none; } }\n' +
+    '  </style>\n' +
+    '</head>\n' +
+    '<body>\n' +
+    '  ' + receiptHTML + '\n' +
+    '  <script>\n' +
+    '    window.onload = function() {\n' +
+    '      window.print();\n' +
+    '      setTimeout(function() { window.close(); }, 500);\n' +
+    '    };\n' +
+    '  <\/script>\n' +
+    '</body>\n' +
+    '</html>'
+  );
+  
+  printWindow.document.close();
 }
 
 window.deleteEmployee = id => {
@@ -1796,47 +1845,179 @@ function printShiftReport() {
 }
 
 // ══════════════════════════════════════════
-// AI ASSISTANT
+// AI ASSISTANT - MOCK VERSION (Inafanya kazi mara moja!)
 // ══════════════════════════════════════════
+
 function toggleAI() {
   document.getElementById("aiPanel").classList.toggle("open");
 }
 
 async function sendAI() {
   const input = document.getElementById("aiInput");
-  const msg = input.value.trim();
+  const msg = input.value.trim().toLowerCase();
   if (!msg) return;
+  
   input.value = "";
   const body = document.getElementById("aiBody");
   body.innerHTML += `<div class="ai-msg user">${msg}</div>`;
   body.innerHTML += `<div class="ai-msg bot ai-typing" id="aiTyping"><span></span><span></span><span></span></div>`;
   body.scrollTop = body.scrollHeight;
 
+  // Simulate thinking (inaonekana kama AI inatafakari)
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  // Pata data halisi kutoka mfumo wako
   const today = new Date().toDateString();
-  const todaySales = sales.filter(s=>new Date(s.timestamp).toDateString()===today).reduce((a,s)=>a+s.total,0);
-  const lowStock = products.filter(p=>p.stock<=p.minStockLevel).length;
-  const topProd = [...products].map(p=>({...p,rev:sales.filter(s=>s.productId===p.id).reduce((a,s)=>a+s.total,0)})).sort((a,b)=>b.rev-a.rev)[0];
-  const context = `Wewe ni msaidizi wa AI wa KALUE Fireworks, kampuni ya fataki Singida, Tanzania. Jibu kwa Kiswahili. Data ya sasa: Mauzo leo TSh ${todaySalesTotal().toLocaleString()}, bidhaa ${products.length}, tahadhari hisa ${lowStock}, wafanyakazi ${employees.length}, bidhaa inayoongoza: ${topProd?.name||'—'}. Mauzo yote: ${sales.length}. Wateja: ${customers.length}. Jibu kwa ufupi na msaada.`;
-
-  try {
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        system: context,
-        messages:[{ role:"user", content:msg }]
-      })
-    });
-    const data = await resp.json();
-    const reply = data.content?.[0]?.text || "Samahani, kuna tatizo. Jaribu tena.";
-    document.getElementById("aiTyping")?.remove();
-    body.innerHTML += `<div class="ai-msg bot">${reply}</div>`;
-  } catch(e) {
-    document.getElementById("aiTyping")?.remove();
-    body.innerHTML += `<div class="ai-msg bot" style="color:var(--red);">⚠️ Hitilafu ya mtandao. Hakikisha uko online.</div>`;
+  const todaySales = sales.filter(s => new Date(s.timestamp).toDateString() === today).reduce((a,s) => a+s.total, 0);
+  const totalSales = sales.reduce((a,s) => a+s.total, 0);
+  const monthSales = sales.filter(s => new Date(s.timestamp).getMonth() === new Date().getMonth()).reduce((a,s) => a+s.total, 0);
+  const lowStockCount = products.filter(p => p.stock <= (p.minStockLevel || 5)).length;
+  const expiredCount = products.filter(p => p.expiryDate && new Date(p.expiryDate) < new Date()).length;
+  const totalStock = products.reduce((a,p) => a + p.stock, 0);
+  const onlineCount = employees.filter(e => e.status === "online").length;
+  const idleCount = employees.filter(e => e.status === "idle").length;
+  const topProduct = [...products].map(p => ({...p, sold: sales.filter(s=>s.productId===p.id).reduce((a,s)=>a+s.quantity,0)})).sort((a,b)=>b.sold-a.sold)[0];
+  const topEmployee = [...employees].map(e => ({...e, salesAmt: sales.filter(s=>s.employeeId===e.id).reduce((a,s)=>a+s.total,0)})).sort((a,b)=>b.salesAmt-a.salesAmt)[0];
+  const leaks = detectLeakages();
+  const f = getSeasonalForecast();
+  
+  let reply = "";
+  
+  // Mauzo related
+  if (msg.includes("mauzo") || msg.includes("sales") || msg.includes("leo") || msg.includes("juzi")) {
+    reply = `📊 **TAKWIMU ZA MAUZO** 📊\n\n` +
+            `┌─────────────────────────┐\n` +
+            `│ ✅ Mauzo ya leo: TSh ${todaySales.toLocaleString()} │\n` +
+            `├─────────────────────────┤\n` +
+            `│ 📆 Mwezi huu: TSh ${monthSales.toLocaleString()} │\n` +
+            `├─────────────────────────┤\n` +
+            `│ 🎆 Jumla yote: TSh ${totalSales.toLocaleString()} │\n` +
+            `└─────────────────────────┘\n\n` +
+            `🏆 **Bidhaa Bora:** ${topProduct?.emoji || '🎆'} ${topProduct?.name || 'Hakuna'} (${topProduct?.sold || 0} vipande)\n` +
+            `👑 **Mfanyakazi Bora:** ${topEmployee?.fullName || '—'} (TSh ${topEmployee?.salesAmt?.toLocaleString() || 0})\n\n` +
+            `💡 ${todaySales < 500000 ? 'Leo mauzo ni kidogo. Jaribu promo kuvutia wateja!' : 'Mauzo mazuri! Endelea kwa kasi hii!'}`;
   }
+  
+  // Hisa related
+  else if (msg.includes("hisa") || msg.includes("stock") || msg.includes("bidhaa") || msg.includes("inventory")) {
+    reply = `📦 **TAARIFA ZA HISA** 📦\n\n` +
+            `┌─────────────────────────────┐\n` +
+            `│ 📦 Jumla ya bidhaa: ${products.length} │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ 🧮 Hisa zote: ${totalStock} vipande │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ ⚠️ Hisa chache: ${lowStockCount} bidhaa │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ ⌛ Imeisha muda: ${expiredCount} bidhaa │\n` +
+            `└─────────────────────────────┘\n\n` +
+            (lowStockCount > 0 ? `🔴 **TAHADHARI:** Bidhaa ${lowStockCount} zina hisa chache. Agiza haraka!\n\n` : `✅ Hali ya hisa ni nzuri.\n\n`) +
+            (topProduct ? `🏆 **Bidhaa inayoongoza:** ${topProduct.emoji} ${topProduct.name}\n` : '');
+  }
+  
+  // Wafanyakazi related
+  else if (msg.includes("wafanyakazi") || msg.includes("employees") || msg.includes("timu") || msg.includes("staff")) {
+    reply = `👥 **TAARIFA ZA WAFANYAKAZI** 👥\n\n` +
+            `┌─────────────────────────┐\n` +
+            `│ 👥 Jumla: ${employees.length} wafanyakazi │\n` +
+            `├─────────────────────────┤\n` +
+            `│ 🟢 Waliopo: ${onlineCount} │\n` +
+            `├─────────────────────────┤\n` +
+            `│ 🟡 Wapo(lakini si active): ${idleCount} │\n` +
+            `├─────────────────────────┤\n` +
+            `│ 🔴 Wameondoka: ${employees.length - onlineCount - idleCount} │\n` +
+            `└─────────────────────────┘\n\n` +
+            `🏆 **Mfanyakazi Bora:** ${topEmployee?.fullName || '—'}\n` +
+            `💰 Mauzo: TSh ${topEmployee?.salesAmt?.toLocaleString() || 0}\n\n` +
+            `💡 Wahimize wafanyakazi kufikia malengo yao kila siku!`;
+  }
+  
+  // Mapato / Faida related
+  else if (msg.includes("faida") || msg.includes("profit") || msg.includes("mapato") || msg.includes("fedha")) {
+    const target = 15000000;
+    const progress = ((monthSales / target) * 100).toFixed(1);
+    reply = `💰 **TAARIFA ZA MAPATO** 💰\n\n` +
+            `┌─────────────────────────────┐\n` +
+            `│ 💵 Jumla ya mapato: TSh ${totalSales.toLocaleString()} │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ 📆 Mwezi huu: TSh ${monthSales.toLocaleString()} │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ 🎯 Lengo la mwezi: TSh ${target.toLocaleString()} │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ 📈 Ufanisi: ${progress}% │\n` +
+            `└─────────────────────────────┘\n\n` +
+            (progress >= 100 ? `🎉 HONGERA! Umefikia lengo la mwezi!` : `📌 Bado TSh ${(target - monthSales).toLocaleString()} kufikia lengo.`) +
+            `\n\n💡 ${progress < 50 ? 'Ongeza jitihada za mauzo wiki hii!' : 'Endelea kwa kasi hii, utafikia lengo!'}`;
+  }
+  
+  // Tahadhari / Alerts
+  else if (msg.includes("tahadhari") || msg.includes("alert") || msg.includes("hatari") || msg.includes("leakage")) {
+    if (leaks.length === 0) {
+      reply = `✅ **Hakuna Tahadhari!** ✅\n\nMfumo wako ni salama kabisa.\n\n` +
+              `📊 Hakuna bidhaa iliyoisha muda wala hisa chache.\n` +
+              `Endelea kufanya kazi vizuri! 🎆`;
+    } else {
+      reply = `⚠️ **TAHADHARI ZA MFUMO** ⚠️\n\n` +
+              leaks.slice(0,6).map((l, i) => `${i+1}. ${l.type}: ${l.msg}`).join('\n') +
+              `\n\n🔴 **PENDEKEZO:** Shughulikia tahadhari hizi haraka ili kuepuka hasara ya mapato.`;
+    }
+  }
+  
+  // Utabiri / Forecast
+  else if (msg.includes("utabiri") || msg.includes("forecast") || msg.includes("baadaye") || msg.includes("msimu")) {
+    reply = `🔮 **UTABIRI WA BAADAYE** 🔮\n\n` +
+            `${f.isSeason ? '🎆 **MSIMU WA FATAAKI!** 🎆\nMahitaji yatakuwa makubwa mwezi huu.\n\n' : '📌 Msimu wa kawaida.\n\n'}` +
+            `┌─────────────────────────────┐\n` +
+            `│ 📈 Utabiri wa mapato: TSh ${Math.round(f.predicted).toLocaleString()} │\n` +
+            `├─────────────────────────────┤\n` +
+            `│ 📦 Hisa inayopendekezwa: ${f.stock} vipande │\n` +
+            `└─────────────────────────────┘\n\n` +
+            `💡 ${f.isSeason ? 'Agiza hisa za ziada ili usikose mauzo wakati wa msimu!' : 'Endelea na mipango yako ya kawaida.'}`;
+  }
+  
+  // Salamu / General greeting
+  else if (msg.includes("habari") || msg.includes("hujambo") || msg.includes("jambo") || msg.includes("hello") || msg.includes("hi") || msg.includes("sema")) {
+    reply = `🎆 **Habari!** 🎆\n\n` +
+            `Mimi ni **AI Assistant wa KALUE Fireworks**.\n\n` +
+            `Ninaweza kukusaidia na:\n` +
+            `📊 Mauzo (leo, mwezi, jumla)\n` +
+            `📦 Hisa na bidhaa\n` +
+            `👥 Wafanyakazi na utendaji\n` +
+            `💰 Mapato na faida\n` +
+            `⚠️ Tahadhari za mfumo\n` +
+            `🔮 Utabiri wa msimu\n\n` +
+            `**Uliza chochote kwa Kiswahili au Kiingereza!**\n\n` +
+            `Kwa mfano: "Mauzo ya leo", "Hisa zikoje", "Wafanyakazi waliopo", "Utabiri wa msimu"`;
+  }
+  
+  // Help
+  else if (msg.includes("help") || msg.includes("msaada") || msg.includes("saidia")) {
+    reply = `🆘 **Msaada wa Matumizi** 🆘\n\n` +
+            `Unaweza kuniuliza maswali kama:\n\n` +
+            `📊 "Mauzo ya leo" - Takwimu za mauzo\n` +
+            `📦 "Hisa zikoje" - Hali ya bidhaa\n` +
+            `👥 "Wafanyakazi waliopo" - Hali ya timu\n` +
+            `💰 "Mapato ya mwezi" - Takwimu za fedha\n` +
+            `⚠️ "Tahadhari" - Matatizo ya mfumo\n` +
+            `🔮 "Utabiri" - Msimu na mahitaji\n\n` +
+            `Au unaweza kuuliza swali lolote kuhusu biashara yako ya fataki! 🎆`;
+  }
+  
+  // Default response
+  else {
+    reply = `🤔 **Samahani, nimekuelewa?** 🤔\n\n` +
+            `Ninaweza kukusaidia na maswali kuhusu:\n` +
+            `• 📊 Mauzo (leo, mwezi, jumla)\n` +
+            `• 📦 Hisa na bidhaa\n` +
+            `• 👥 Wafanyakazi\n` +
+            `• 💰 Mapato na faida\n` +
+            `• ⚠️ Tahadhari za mfumo\n` +
+            `• 🔮 Utabiri wa msimu\n\n` +
+            `**Jaribu kuuliza kwa Kiswahili au Kiingereza!**\n\n` +
+            `Kwa mfano: "Mauzo ya leo", "Hisa zikoje", au andika "msaada" kwa maelezo zaidi. 🎆`;
+  }
+  
+  document.getElementById("aiTyping")?.remove();
+  body.innerHTML += `<div class="ai-msg bot">${reply.replace(/\n/g, '<br>')}</div>`;
   body.scrollTop = body.scrollHeight;
 }
 
