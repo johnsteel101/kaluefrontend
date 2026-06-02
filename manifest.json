@@ -1,0 +1,18 @@
+{
+  "name": "KALUE Fireworks",
+  "short_name": "KALUE",
+  "description": "Revenue Protection System - Usimamizi wa mauzo na hisa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090f",
+  "theme_color": "#ff5722",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
